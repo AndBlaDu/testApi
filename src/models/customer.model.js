@@ -7,7 +7,7 @@ const Customer = sequelize.define('customers', {
         primaryKey: true
     },
     customerName: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING(50)
     },
     contactLastName: {
         type: Sequelize.STRING

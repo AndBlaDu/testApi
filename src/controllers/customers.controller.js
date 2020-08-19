@@ -5,12 +5,17 @@ async function getCustomers(req, res) {
 
     await CustomerModel.findAll({
         attributes: ['customerNumber', 'customerName', 'contactLastName', 'contactFirstName', 'phone', 'country']
-    }).then((result) => {
+    }).then(result => {
+
+        let date = new Date();
+        // var d = new Date();
+        // d.setDate(d.getDate() - 1);
         res.json({
             count: result.length,
-            customers: result
+            customers: result,
+            date
         });
-    }).catch((error) => {
+    }).catch(error => {
         res.status(400).json({
             ok: false,
             error
@@ -27,11 +32,11 @@ async function getCustomer(req, res) {
         where: {
             customerNumber: customerId
         }
-    }).then((customer) => {
+    }).then(customer => {
         res.json({
             customer
         });
-    }).catch((error) => {
+    }).catch(error => {
         res.status(400).json({
             ok: false,
             error
@@ -44,12 +49,39 @@ async function updateCustomer(req, res) {
     let customerId = req.body.customerId;
     let customerName = req.body.name;
 
-    if (customerId == null || customerId == '') {
-        res.status(400).json({
+    if (customerId == null || customerId == '' || customerName == null || customerName == '') {
+        return res.status(400).json({
             ok: false,
-            error: 'CustomerId no puede ser null'
+            error: 'CustomerId no puede ser null o vacio'
         });
     }
+
+    await CustomerModel.findOne({
+        where: {
+            customerNumber: customerId
+        }
+    }).then(customer => {
+
+        customer.update({ customerName }).then(updatedCustomer => {
+            return res.json({
+                updatedCustomer
+            });
+        }).catch(err => {
+            return res.status(400).json({
+                ok: false,
+                error: 'Ha ocurrido un error.',
+                detail: err
+            });
+        });;
+
+    }).catch(err => {
+        return res.status(400).json({
+            ok: false,
+            error: 'Ha ocurrido un error.',
+            detail: err
+        });
+    });
+
 }
 
 
